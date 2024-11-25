@@ -154,8 +154,16 @@ public class MatrixMultiplicationApp extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-    
 
+    /**
+     * Creates a GridPane object with the specified dimensions.
+     * The GridPane will have a TextField in each cell for users to enter values for each index of the matrix.
+     *
+     * @param rows Specifies the number of rows that the resulting GridPane will have.
+     * @param cols Specifies the number of columns that the resulting GridPane will have.
+     * @param title Specifies the title, which is used in the input TextField to show the user which matrix they are inputting values for.
+     * @return Returns the created GridPane object.
+     */
     private GridPane createMatrixGrid(int rows, int cols, String title) {
         GridPane grid = new GridPane();
         grid.setHgap(5);
@@ -174,6 +182,14 @@ public class MatrixMultiplicationApp extends Application {
         return grid;
     }
 
+    /**
+     *  Returns an int[][] containing the values of a GridPane.
+     *
+     * @param node A node that points to a GridPane.
+     * @param rows The number of rows that the GridPane has.
+     * @param cols The number of columns that the GridPane has.
+     * @return An int[][] containing the values that have been entered into a GridPane.
+     */
     private int[][] extractMatrixFromGrid(Node node, int rows, int cols) {
         GridPane grid = (GridPane) node;
         int[][] matrix = new int[rows][cols];
@@ -190,6 +206,13 @@ public class MatrixMultiplicationApp extends Application {
         return matrix;
     }
 
+    /**
+     * Returns the result of adding two matrices.
+     *
+     * @param matrix1 The first matrix to be added.
+     * @param matrix2 The second matrix to be added.
+     * @return The result of adding matrix1 and matrix2.
+     */
     private int[][] addMatrices(int[][] matrix1, int[][] matrix2) {
         int rows = matrix1.length;
         int cols = matrix1[0].length;
@@ -202,6 +225,13 @@ public class MatrixMultiplicationApp extends Application {
         return result;
     }
 
+    /**
+     * Returns the result of subtracting matrix2 from matrix1.
+     *
+     * @param matrix1 The matrix to be subtracted from.
+     * @param matrix2 The matrix to be subtracted.
+     * @return The result of subtracting matrix2 from matrix1.
+     */
     private int[][] subtractMatrices(int[][] matrix1, int[][] matrix2) {
         int rows = matrix1.length;
         int cols = matrix1[0].length;
@@ -214,6 +244,13 @@ public class MatrixMultiplicationApp extends Application {
         return result;
     }
 
+    /**
+     * Returns the result of dividing matrix1 by matrix2.
+     *
+     * @param matrix1 The matrix to be divided.
+     * @param matrix2 The matrix to be divided by.
+     * @return The result of dividing matrix1 by matrix2.
+     */
     private int[][] divideMatrices(int[][] matrix1, int[][] matrix2) {
         int rows = matrix1.length;
         int cols = matrix1[0].length;
@@ -229,6 +266,13 @@ public class MatrixMultiplicationApp extends Application {
         return result;
     }
 
+    /**
+     * Returns the result of multiplying two matrices.
+     *
+     * @param matrix1 The first matrix to be multiplied.
+     * @param matrix2 The second matrix to be multiplied.
+     * @return The result of multiplying matrix1 and matrix2.
+     */
     private int[][] multiplyMatrices(int[][] matrix1, int[][] matrix2) {
         int rows1 = matrix1.length;
         int cols1 = matrix1[0].length;
@@ -246,6 +290,12 @@ public class MatrixMultiplicationApp extends Application {
         return resultMatrix;
     }
 
+    /**
+     * Creates a GridPane from an int[][].
+     *
+     * @param matrix The matrix to be converted into a GridPane.
+     * @return A GridPane containing the values from the input matrix.
+     */
     private GridPane createResultGrid(int[][] matrix) {
         GridPane grid = new GridPane();
         grid.setHgap(5);
@@ -263,6 +313,11 @@ public class MatrixMultiplicationApp extends Application {
         return grid;
     }
 
+    /**
+     * Launches a javaFX window that allows the user to use the matrix calculator.
+     *
+     * @param args The arguments that are passed in from the command line.
+     */
     public static void main(String[] args) {
         launch(args);
     }
