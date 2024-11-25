@@ -1,6 +1,8 @@
 package com.example;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -10,6 +12,11 @@ import javafx.stage.Stage;
 
 public class MatrixMultiplicationApp extends Application {
 
+    /**
+     * Launches the javaFx window and displays the GUI.
+     *
+     * @param primaryStage Used by JavaFx.
+     */
     @Override
     public void start(Stage primaryStage) {
         // Layout and Controls
@@ -58,87 +65,17 @@ public class MatrixMultiplicationApp extends Application {
     
         // Button Action to Generate Input Grids
         generateButton.setOnAction(e -> {
-            inputGrids.getChildren().clear();
-            resultLabel.setText("");
-    
-            try {
-                int rows1 = Integer.parseInt(rows1Field.getText());
-                int cols1 = Integer.parseInt(cols1Field.getText());
-                int rows2 = Integer.parseInt(rows2Field.getText());
-                int cols2 = Integer.parseInt(cols2Field.getText());
-    
-                // Validation for matrices
-                String operation = operatorComboBox.getValue();
-                if (operation.equals("Multiplication") && cols1 != rows2) {
-                    resultLabel.setText("Matrix multiplication not possible: Columns of Matrix 1 must equal Rows of Matrix 2.");
-                    calculateButton.setDisable(true);
-                    return;
-                } else if (!operation.equals("Multiplication") && (rows1 != rows2 || cols1 != cols2)) {
-                    resultLabel.setText("Matrix addition/subtraction/division requires matrices of the same dimensions.");
-                    calculateButton.setDisable(true);
-                    return;
-                }
-    
-                // Matrix 1 Grid
-                GridPane grid1 = createMatrixGrid(rows1, cols1, "Matrix 1");
-                // Matrix 2 Grid
-                GridPane grid2 = createMatrixGrid(rows2, cols2, "Matrix 2");
-    
-                inputGrids.getChildren().addAll(grid1, grid2);
-                calculateButton.setDisable(false);
-    
-            } catch (NumberFormatException ex) {
-                resultLabel.setText("Please enter valid integers for matrix dimensions.");
-            }
+            generateInputGrids(inputGrids, resultLabel, rows1Field, cols1Field, rows2Field, cols2Field, operatorComboBox, calculateButton);
         });
     
         // Button Action to Calculate Result
         calculateButton.setOnAction(e -> {
-            try {
-                int rows1 = Integer.parseInt(rows1Field.getText());
-                int cols1 = Integer.parseInt(cols1Field.getText());
-                int rows2 = Integer.parseInt(rows2Field.getText());
-                int cols2 = Integer.parseInt(cols2Field.getText());
-    
-                int[][] matrix1 = extractMatrixFromGrid(inputGrids.getChildren().get(0), rows1, cols1);
-                int[][] matrix2 = extractMatrixFromGrid(inputGrids.getChildren().get(1), rows2, cols2);
-    
-                int[][] resultMatrix;
-                String operation = operatorComboBox.getValue();
-                switch (operation) {
-                    case "Addition":
-                        resultMatrix = addMatrices(matrix1, matrix2);
-                        break;
-                    case "Subtraction":
-                        resultMatrix = subtractMatrices(matrix1, matrix2);
-                        break;
-                    case "Division":
-                        resultMatrix = divideMatrices(matrix1, matrix2);
-                        break;
-                    case "Multiplication":
-                    default:
-                        resultMatrix = multiplyMatrices(matrix1, matrix2);
-                }
-    
-                // Display Result
-                GridPane resultGrid = createResultGrid(resultMatrix);
-                inputGrids.getChildren().add(resultGrid);
-    
-            } catch (NumberFormatException ex) {
-                resultLabel.setText("Please ensure all matrix elements are valid integers.");
-            }
+            calculateResult(rows1Field, cols1Field, rows2Field, cols2Field, inputGrids, operatorComboBox, resultLabel);
         });
     
         // Clear Button Action
         clearButton.setOnAction(e -> {
-            rows1Field.clear();
-            cols1Field.clear();
-            rows2Field.clear();
-            cols2Field.clear();
-            operatorComboBox.setValue("Multiplication");
-            inputGrids.getChildren().clear();
-            resultLabel.setText("");
-            calculateButton.setDisable(true);
+            clearValues(rows1Field, cols1Field, rows2Field, cols2Field, operatorComboBox, inputGrids, resultLabel, calculateButton);
         });
     
         // Wrap the entire layout in a ScrollPane
@@ -153,6 +90,123 @@ public class MatrixMultiplicationApp extends Application {
         primaryStage.setTitle("Matrix Operations");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    /**
+     * Generates and displays grids that allow the user to input values.
+     *
+     * @param inputGrids A box containing all input grids.
+     * @param resultLabel A label that displays information about the result, including errors.
+     * @param rows1Field The value that was entered for the rows of matrix1.
+     * @param cols1Field The value that was entered for the columns of matrix1.
+     * @param rows2Field The value that was entered for the rows of matrix2.
+     * @param cols2Field The value that was entered for the columns of matrix2.
+     * @param operatorComboBox The ComboBox that is used to select the operation.
+     * @param calculateButton The button that is used to calculate the result.
+     */
+    private void generateInputGrids(VBox inputGrids, Label resultLabel, TextField rows1Field, TextField cols1Field, TextField rows2Field, TextField cols2Field, ComboBox<String> operatorComboBox, Button calculateButton) {
+        inputGrids.getChildren().clear();
+        resultLabel.setText("");
+
+        try {
+            int rows1 = Integer.parseInt(rows1Field.getText());
+            int cols1 = Integer.parseInt(cols1Field.getText());
+            int rows2 = Integer.parseInt(rows2Field.getText());
+            int cols2 = Integer.parseInt(cols2Field.getText());
+
+            // Validation for matrices
+            String operation = operatorComboBox.getValue();
+            if (operation.equals("Multiplication") && cols1 != rows2) {
+                resultLabel.setText("Matrix multiplication not possible: Columns of Matrix 1 must equal Rows of Matrix 2.");
+                calculateButton.setDisable(true);
+                return;
+            } else if (!operation.equals("Multiplication") && (rows1 != rows2 || cols1 != cols2)) {
+                resultLabel.setText("Matrix addition/subtraction/division requires matrices of the same dimensions.");
+                calculateButton.setDisable(true);
+                return;
+            }
+
+            // Matrix 1 Grid
+            GridPane grid1 = createMatrixGrid(rows1, cols1, "Matrix 1");
+            // Matrix 2 Grid
+            GridPane grid2 = createMatrixGrid(rows2, cols2, "Matrix 2");
+
+            inputGrids.getChildren().addAll(grid1, grid2);
+            calculateButton.setDisable(false);
+
+        } catch (NumberFormatException ex) {
+            resultLabel.setText("Please enter valid integers for matrix dimensions.");
+        }
+    }
+
+    /**
+     * Calculates the result of the specified operation on the input values for matrix1 and matrix2.
+     *
+     * @param rows1Field The value that was entered for the rows of matrix1.
+     * @param cols1Field The value that was entered for the columns of matrix1.
+     * @param rows2Field The value that was entered for the rows of matrix2.
+     * @param cols2Field The value that was entered for the columns of matrix2.
+     * @param inputGrids A box containing all input grids.
+     * @param operatorComboBox The ComboBox that is used to select the operation.
+     * @param resultLabel A label that displays information about the result, including errors.
+     */
+    private void calculateResult(TextField rows1Field, TextField cols1Field, TextField rows2Field, TextField cols2Field, VBox inputGrids, ComboBox<String> operatorComboBox, Label resultLabel) {
+        try {
+            int rows1 = Integer.parseInt(rows1Field.getText());
+            int cols1 = Integer.parseInt(cols1Field.getText());
+            int rows2 = Integer.parseInt(rows2Field.getText());
+            int cols2 = Integer.parseInt(cols2Field.getText());
+
+            int[][] matrix1 = extractMatrixFromGrid(inputGrids.getChildren().get(0), rows1, cols1);
+            int[][] matrix2 = extractMatrixFromGrid(inputGrids.getChildren().get(1), rows2, cols2);
+
+            int[][] resultMatrix;
+            String operation = operatorComboBox.getValue();
+            switch (operation) {
+                case "Addition":
+                    resultMatrix = addMatrices(matrix1, matrix2);
+                    break;
+                case "Subtraction":
+                    resultMatrix = subtractMatrices(matrix1, matrix2);
+                    break;
+                case "Division":
+                    resultMatrix = divideMatrices(matrix1, matrix2);
+                    break;
+                case "Multiplication":
+                default:
+                    resultMatrix = multiplyMatrices(matrix1, matrix2);
+            }
+
+            // Display Result
+            GridPane resultGrid = createResultGrid(resultMatrix);
+            inputGrids.getChildren().add(resultGrid);
+
+        } catch (NumberFormatException ex) {
+            resultLabel.setText("Please ensure all matrix elements are valid integers.");
+        }
+    }
+
+    /**
+     *Clears all the values that have been input.
+     *
+     * @param rows1Field The value that was entered for the rows of matrix1.
+     * @param cols1Field The value that was entered for the columns of matrix1.
+     * @param rows2Field The value that was entered for the rows of matrix2.
+     * @param cols2Field The value that was entered for the columns of matrix2.
+     * @param operatorComboBox The ComboBox that is used to select the operation.
+     * @param inputGrids A box containing all input grids.
+     * @param resultLabel A label that displays information about the result, including errors.
+     * @param calculateButton The button that is used to calculate the result.
+     */
+    private static void clearValues(TextField rows1Field, TextField cols1Field, TextField rows2Field, TextField cols2Field, ComboBox<String> operatorComboBox, VBox inputGrids, Label resultLabel, Button calculateButton) {
+        rows1Field.clear();
+        cols1Field.clear();
+        rows2Field.clear();
+        cols2Field.clear();
+        operatorComboBox.setValue("Multiplication");
+        inputGrids.getChildren().clear();
+        resultLabel.setText("");
+        calculateButton.setDisable(true);
     }
 
     /**
