@@ -368,6 +368,41 @@ public class MatrixMultiplicationApp extends Application {
     }
 
     /**
+     * Multiplies a matrix by a scalar.
+     *
+     * @param matrix The matrix to be multiplied.
+     * @param a The scalar that the input matrix is to be multiplied by.
+     * @return The result of multiplying matrix by a.
+     */
+    public static int[][] multiplyMatrixByScalar(int[][] matrix, int a) {
+        int rows = matrix.length;
+        int cols = matrix[0].length;
+        int[][] result = new int[rows][cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                result[i][j] = matrix[i][j] * a;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Raises the input matrix to the input power via repeated multiplication.
+     *
+     * @param matrix The matrix that is to be raised to the given power.
+     * @param power The power that the matrix is to be raised to.
+     * @return The result of raising the input matrix to the input power.
+     */
+    public static int[][] raiseMatrixToPower(int[][] matrix, int power) {
+        int[][] result = matrix;
+        if (power == 0) {result = new int[][]{{1}};}
+        for (int i = 1; i < power; i++) {
+            result = multiplyMatrices(matrix, result);
+        }
+        return result;
+    }
+
+    /**
      * Calculates the determinant of a given matrix.
      *
      * @param matrix The matrix to calculate the determinant for.
