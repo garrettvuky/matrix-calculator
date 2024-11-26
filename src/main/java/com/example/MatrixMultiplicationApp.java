@@ -44,7 +44,7 @@ public class MatrixMultiplicationApp extends Application {
         // Operator Selection
         Label operatorLabel = new Label("Select Operation:");
         ComboBox<String> operatorComboBox = new ComboBox<>();
-        operatorComboBox.getItems().addAll("Addition", "Subtraction", "Multiplication", "Determinant", "Transpose");
+        operatorComboBox.getItems().addAll("Addition", "Subtraction", "Multiplication", "Multiplication (Scalar)", "Exponent", "Determinant", "Transpose");
         operatorComboBox.setValue("Multiplication");
     
         // Button to generate matrix input grids
@@ -110,11 +110,16 @@ public class MatrixMultiplicationApp extends Application {
 
         try {
             String operation = operatorComboBox.getValue();
+            boolean binaryOp = !(operation.equals("Determinant")
+                    || operation.equals("Transpose")
+                    || operation.equals("Multiplication (Scalar)")
+                    || operation.equals("Exponent"));
+            boolean scalarOperand = operation.equals("Multiplication (Scalar)")
+                                    || operation.equals("Exponent");
             int rows1 = 0, cols1 = 0, rows2 = 0, cols2 = 0;
             rows1 = Integer.parseInt(rows1Field.getText());
             cols1 = Integer.parseInt(cols1Field.getText());
-            if (!(operation.equals("Determinant")
-                || operation.equals("Transpose"))) {
+            if (binaryOp) {
                 rows2 = Integer.parseInt(rows2Field.getText());
                 cols2 = Integer.parseInt(cols2Field.getText());
             }
@@ -142,6 +147,16 @@ public class MatrixMultiplicationApp extends Application {
                         return;
                     }
                     break;
+                case "Multiplication (Scalar)":
+                    //No constraints on dimensions
+                    break;
+                case "Exponent":
+                    if (rows1 != cols1) {
+                        resultLabel.setText("Matrix exponent requires square matrix.");
+                        calculateButton.setDisable(true);
+                        return;
+                    }
+                    break;
                 case "Determinant":
                     if (rows1 != cols1) {
                         resultLabel.setText("Matrix determinant requires square matrix.");
@@ -162,9 +177,12 @@ public class MatrixMultiplicationApp extends Application {
             GridPane grid1 = createMatrixGrid(rows1, cols1, "Matrix 1");
             inputGrids.getChildren().addAll(grid1);
             // Matrix 2 Grid
-            if (!(operation.equals("Determinant")
-                || operation.equals("Transpose"))) {
+            if (binaryOp) {
                 GridPane grid2 = createMatrixGrid(rows2, cols2, "Matrix 2");
+                inputGrids.getChildren().addAll(grid2);
+            }
+            if (scalarOperand) {
+                GridPane grid2 = createMatrixGrid(1, 1, "Scalar");
                 inputGrids.getChildren().addAll(grid2);
             }
             calculateButton.setDisable(false);
@@ -188,16 +206,27 @@ public class MatrixMultiplicationApp extends Application {
     private void calculateResult(TextField rows1Field, TextField cols1Field, TextField rows2Field, TextField cols2Field, VBox inputGrids, ComboBox<String> operatorComboBox, Label resultLabel) {
         try {
             String operation = operatorComboBox.getValue();
+            boolean binaryOp = !(operation.equals("Determinant")
+                    || operation.equals("Transpose")
+                    || operation.equals("Multiplication (Scalar)")
+                    || operation.equals("Exponent"));
+            boolean scalarOperand = operation.equals("Multiplication (Scalar)")
+                    || operation.equals("Exponent");
             int rows1 = 0, cols1 = 0, rows2 = 0, cols2 = 0;
             int[][] matrix1, matrix2 = {{0}};
+            int scalar = 0;
+
             rows1 = Integer.parseInt(rows1Field.getText());
             cols1 = Integer.parseInt(cols1Field.getText());
             matrix1 = extractMatrixFromGrid(inputGrids.getChildren().get(0), rows1, cols1);
-            if (!(operation.equals("Determinant")
-                || operation.equals("Transpose"))) {
+
+            if (binaryOp) {
                 rows2 = Integer.parseInt(rows2Field.getText());
                 cols2 = Integer.parseInt(cols2Field.getText());
                 matrix2 = extractMatrixFromGrid(inputGrids.getChildren().get(1), rows2, cols2);
+            }
+            if (scalarOperand) {
+                scalar = extractMatrixFromGrid(inputGrids.getChildren().get(1), 1, 1)[0][0];
             }
 
 
@@ -212,6 +241,12 @@ public class MatrixMultiplicationApp extends Application {
                 case "Multiplication":
                 default:
                     resultMatrix = multiplyMatrices(matrix1, matrix2);
+                    break;
+                case "Multiplication (Scalar)":
+                    resultMatrix = multiplyMatrixByScalar(matrix1, scalar);
+                    break;
+                case "Exponent":
+                    resultMatrix = raiseMatrixToPower(matrix1, scalar);
                     break;
                 case "Determinant":
                     resultMatrix = new int[][]{{calcDeterminant(matrix1)}};
@@ -387,7 +422,7 @@ public class MatrixMultiplicationApp extends Application {
     }
 
     /**
-     * Raises the input matrix to the input power via repeated multiplication.
+     * Raises the input matrix to a scalar power via repeated multiplication.
      *
      * @param matrix The matrix that is to be raised to the given power.
      * @param power The power that the matrix is to be raised to.
