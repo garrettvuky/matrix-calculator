@@ -2,7 +2,7 @@ import com.example.MatrixMultiplicationApp;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class Tests {
+public class MatrixTests {
 
     @Test
     public void testAddingMatrices() {
