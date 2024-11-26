@@ -206,9 +206,6 @@ public class MatrixMultiplicationApp extends Application {
                 case "Subtraction":
                     resultMatrix = subtractMatrices(matrix1, matrix2);
                     break;
-                case "Division":
-                    resultMatrix = divideMatrices(matrix1, matrix2);
-                    break;
                 case "Multiplication":
                 default:
                     resultMatrix = multiplyMatrices(matrix1, matrix2);
@@ -339,27 +336,6 @@ public class MatrixMultiplicationApp extends Application {
         return result;
     }
 
-    /**
-     * Returns the result of dividing matrix1 by matrix2.
-     *
-     * @param matrix1 The matrix to be divided.
-     * @param matrix2 The matrix to be divided by.
-     * @return The result of dividing matrix1 by matrix2.
-     */
-    public static int[][] divideMatrices(int[][] matrix1, int[][] matrix2) {
-        int rows = matrix1.length;
-        int cols = matrix1[0].length;
-        int[][] result = new int[rows][cols];
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                if (matrix2[i][j] == 0) {
-                    throw new ArithmeticException("Division by zero detected in matrix elements.");
-                }
-                result[i][j] = matrix1[i][j] / matrix2[i][j];
-            }
-        }
-        return result;
-    }
 
     /**
      * Returns the result of multiplying two matrices.
