@@ -44,7 +44,7 @@ public class MatrixMultiplicationApp extends Application {
         // Operator Selection
         Label operatorLabel = new Label("Select Operation:");
         ComboBox<String> operatorComboBox = new ComboBox<>();
-        operatorComboBox.getItems().addAll("Addition", "Subtraction", "Multiplication", "Division");
+        operatorComboBox.getItems().addAll("Addition", "Subtraction", "Multiplication", "Determinant");
         operatorComboBox.setValue("Multiplication");
     
         // Button to generate matrix input grids
@@ -109,29 +109,62 @@ public class MatrixMultiplicationApp extends Application {
         resultLabel.setText("");
 
         try {
-            int rows1 = Integer.parseInt(rows1Field.getText());
-            int cols1 = Integer.parseInt(cols1Field.getText());
-            int rows2 = Integer.parseInt(rows2Field.getText());
-            int cols2 = Integer.parseInt(cols2Field.getText());
+            String operation = operatorComboBox.getValue();
+            int rows1 = 0, cols1 = 0, rows2 = 0, cols2 = 0;
+            rows1 = Integer.parseInt(rows1Field.getText());
+            cols1 = Integer.parseInt(cols1Field.getText());
+            if (!(operation.equals("Determinant"))) {
+                rows2 = Integer.parseInt(rows2Field.getText());
+                cols2 = Integer.parseInt(cols2Field.getText());
+            }
 
             // Validation for matrices
-            String operation = operatorComboBox.getValue();
-            if (operation.equals("Multiplication") && cols1 != rows2) {
-                resultLabel.setText("Matrix multiplication not possible: Columns of Matrix 1 must equal Rows of Matrix 2.");
-                calculateButton.setDisable(true);
-                return;
-            } else if (!operation.equals("Multiplication") && (rows1 != rows2 || cols1 != cols2)) {
-                resultLabel.setText("Matrix addition/subtraction/division requires matrices of the same dimensions.");
-                calculateButton.setDisable(true);
-                return;
+            switch (operation) {
+                case "Addition":
+                    if (rows1 != rows2 || cols1 != cols2) {
+                        resultLabel.setText("Matrix addition requires matrices of the same dimensions.");
+                        calculateButton.setDisable(true);
+                        return;
+                    }
+                    break;
+                case "Subtraction":
+                    if (rows1 != rows2 || cols1 != cols2) {
+                        resultLabel.setText("Matrix subtraction requires matrices of the same dimensions.");
+                        calculateButton.setDisable(true);
+                        return;
+                    }
+                    break;
+                case "Multiplication":
+                    if (cols1 != rows2) {
+                        resultLabel.setText("Matrix multiplication not possible: Columns of Matrix 1 must equal Rows of Matrix 2.");
+                        calculateButton.setDisable(true);
+                        return;
+                    }
+                    break;
+                case "Determinant":
+                    if (rows1 != cols1) {
+                        resultLabel.setText("Matrix determinant requires square matrix.");
+                        calculateButton.setDisable(true);
+                        return;
+                    }
+                    break;
+                case "Inverse":
+                    if (rows1 != cols1) {
+                        resultLabel.setText("Matrix inversion requires square matrix.");
+                        calculateButton.setDisable(true);
+                        return;
+                    }
+                    break;
             }
 
             // Matrix 1 Grid
             GridPane grid1 = createMatrixGrid(rows1, cols1, "Matrix 1");
+            inputGrids.getChildren().addAll(grid1);
             // Matrix 2 Grid
-            GridPane grid2 = createMatrixGrid(rows2, cols2, "Matrix 2");
-
-            inputGrids.getChildren().addAll(grid1, grid2);
+            if (!(operation.equals("Determinant"))) {
+                GridPane grid2 = createMatrixGrid(rows2, cols2, "Matrix 2");
+                inputGrids.getChildren().addAll(grid2);
+            }
             calculateButton.setDisable(false);
 
         } catch (NumberFormatException ex) {
@@ -152,16 +185,20 @@ public class MatrixMultiplicationApp extends Application {
      */
     private void calculateResult(TextField rows1Field, TextField cols1Field, TextField rows2Field, TextField cols2Field, VBox inputGrids, ComboBox<String> operatorComboBox, Label resultLabel) {
         try {
-            int rows1 = Integer.parseInt(rows1Field.getText());
-            int cols1 = Integer.parseInt(cols1Field.getText());
-            int rows2 = Integer.parseInt(rows2Field.getText());
-            int cols2 = Integer.parseInt(cols2Field.getText());
+            String operation = operatorComboBox.getValue();
+            int rows1 = 0, cols1 = 0, rows2 = 0, cols2 = 0;
+            int[][] matrix1, matrix2 = {{0}};
+            rows1 = Integer.parseInt(rows1Field.getText());
+            cols1 = Integer.parseInt(cols1Field.getText());
+            matrix1 = extractMatrixFromGrid(inputGrids.getChildren().get(0), rows1, cols1);
+            if (!(operation.equals("Determinant"))) {
+                rows2 = Integer.parseInt(rows2Field.getText());
+                cols2 = Integer.parseInt(cols2Field.getText());
+                matrix2 = extractMatrixFromGrid(inputGrids.getChildren().get(1), rows2, cols2);
+            }
 
-            int[][] matrix1 = extractMatrixFromGrid(inputGrids.getChildren().get(0), rows1, cols1);
-            int[][] matrix2 = extractMatrixFromGrid(inputGrids.getChildren().get(1), rows2, cols2);
 
             int[][] resultMatrix;
-            String operation = operatorComboBox.getValue();
             switch (operation) {
                 case "Addition":
                     resultMatrix = addMatrices(matrix1, matrix2);
@@ -175,6 +212,10 @@ public class MatrixMultiplicationApp extends Application {
                 case "Multiplication":
                 default:
                     resultMatrix = multiplyMatrices(matrix1, matrix2);
+                    break;
+                case "Determinant":
+                    resultMatrix = new int[][]{{calcDeterminant(matrix1)}};
+                    break;
             }
 
             // Display Result
@@ -342,6 +383,52 @@ public class MatrixMultiplicationApp extends Application {
             }
         }
         return resultMatrix;
+    }
+
+    /**
+     * Calculates the determinant of a given matrix.
+     *
+     * @param matrix The matrix to calculate the determinant for.
+     * @return An integer containing the determinant.
+     */
+    public static int calcDeterminant(int[][] matrix) {
+        int n = matrix.length;
+        int determinant = 0;
+        if (n == 1) {return matrix[0][0];}
+        if (n == 2) {return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];}
+        else {
+            for (int i = 0; i < n; i++) {
+                int[][] strikeMatrix = strikeMatrix(matrix, 0, i);
+                determinant += matrix[0][i] * calcDeterminant(strikeMatrix) * Math.pow(-1, i);
+            }
+        }
+        return determinant;
+    }
+
+    /**
+     * Generates the matrix that is formed by removing the row and column that a given element belongs to.
+     * This is used to calculate the determinant of a matrix that is larger than 2x2.
+     *
+     * @param matrix The source matrix.
+     * @param row The row that is being struck from the matrix.
+     * @param column The column that is being struck from the matrix.
+     * @return The matrix that is formed by striking the given row and column from the source matrix.
+     */
+    public static int[][] strikeMatrix(int[][] matrix, int row, int column) {
+        int n = matrix.length - 1; //Length of the resulting matrix
+        int a = 0, b = 0;
+        int[][] result = new int[n][n];
+        for (int i = 0; i <= n; i++) {
+            if (i == row) {continue;}
+            b = 0;
+            for (int j = 0; j <= n; j++) {
+                if (j == column) {continue;}
+                result[a][b] = matrix[i][j];
+                b++;
+            }
+            a++;
+        }
+        return result;
     }
 
     /**
