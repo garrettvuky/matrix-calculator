@@ -50,4 +50,12 @@ public class MatrixTests {
         int[][] m = {{1,2,3},{4,5,6},{7,8,9}};
         assertEquals(0, MatrixMultiplicationApp.calcDeterminant(m), "Calculating the determinant returned a value that was not equal to the expected value.");
     }
+
+    @Test
+    public void testTransposeMatrix() {
+        int[][] m = {{1,2,3},{4,5,6},{7,8,9}};
+        int[][] expected = {{1,4,7},{2,5,8},{3,6,9}};
+        int[][] result = MatrixMultiplicationApp.transposeMatrix(m);
+        assertTrue(java.util.Arrays.deepEquals(expected,result), "Transposed matrix is not equal to the expected result.");
+    }
 }

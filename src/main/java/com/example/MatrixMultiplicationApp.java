@@ -44,7 +44,7 @@ public class MatrixMultiplicationApp extends Application {
         // Operator Selection
         Label operatorLabel = new Label("Select Operation:");
         ComboBox<String> operatorComboBox = new ComboBox<>();
-        operatorComboBox.getItems().addAll("Addition", "Subtraction", "Multiplication", "Determinant");
+        operatorComboBox.getItems().addAll("Addition", "Subtraction", "Multiplication", "Determinant", "Transpose");
         operatorComboBox.setValue("Multiplication");
     
         // Button to generate matrix input grids
@@ -113,7 +113,8 @@ public class MatrixMultiplicationApp extends Application {
             int rows1 = 0, cols1 = 0, rows2 = 0, cols2 = 0;
             rows1 = Integer.parseInt(rows1Field.getText());
             cols1 = Integer.parseInt(cols1Field.getText());
-            if (!(operation.equals("Determinant"))) {
+            if (!(operation.equals("Determinant")
+                || operation.equals("Transpose"))) {
                 rows2 = Integer.parseInt(rows2Field.getText());
                 cols2 = Integer.parseInt(cols2Field.getText());
             }
@@ -148,9 +149,9 @@ public class MatrixMultiplicationApp extends Application {
                         return;
                     }
                     break;
-                case "Inverse":
+                case "Transpose":
                     if (rows1 != cols1) {
-                        resultLabel.setText("Matrix inversion requires square matrix.");
+                        resultLabel.setText("Matrix transposition requires square matrix.");
                         calculateButton.setDisable(true);
                         return;
                     }
@@ -161,7 +162,8 @@ public class MatrixMultiplicationApp extends Application {
             GridPane grid1 = createMatrixGrid(rows1, cols1, "Matrix 1");
             inputGrids.getChildren().addAll(grid1);
             // Matrix 2 Grid
-            if (!(operation.equals("Determinant"))) {
+            if (!(operation.equals("Determinant")
+                || operation.equals("Transpose"))) {
                 GridPane grid2 = createMatrixGrid(rows2, cols2, "Matrix 2");
                 inputGrids.getChildren().addAll(grid2);
             }
@@ -191,7 +193,8 @@ public class MatrixMultiplicationApp extends Application {
             rows1 = Integer.parseInt(rows1Field.getText());
             cols1 = Integer.parseInt(cols1Field.getText());
             matrix1 = extractMatrixFromGrid(inputGrids.getChildren().get(0), rows1, cols1);
-            if (!(operation.equals("Determinant"))) {
+            if (!(operation.equals("Determinant")
+                || operation.equals("Transpose"))) {
                 rows2 = Integer.parseInt(rows2Field.getText());
                 cols2 = Integer.parseInt(cols2Field.getText());
                 matrix2 = extractMatrixFromGrid(inputGrids.getChildren().get(1), rows2, cols2);
@@ -212,6 +215,9 @@ public class MatrixMultiplicationApp extends Application {
                     break;
                 case "Determinant":
                     resultMatrix = new int[][]{{calcDeterminant(matrix1)}};
+                    break;
+                case "Transpose":
+                    resultMatrix = transposeMatrix(matrix1);
                     break;
             }
 
@@ -403,6 +409,24 @@ public class MatrixMultiplicationApp extends Application {
                 b++;
             }
             a++;
+        }
+        return result;
+    }
+
+    /**
+     * Transposes the input matrix such that each element m,n of the result matrix is equal to element n,m of the source matrix.
+     *
+     * @param matrix The matrix to be transposed.
+     * @return The result of transposing the source matrix.
+     */
+    public static int[][] transposeMatrix(int[][] matrix) {
+        int m = matrix.length;
+        int n = matrix[0].length;
+        int[][] result = new int[m][n];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                result[j][i] = matrix[i][j];
+            }
         }
         return result;
     }
