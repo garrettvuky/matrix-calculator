@@ -239,7 +239,7 @@ public class MatrixMultiplicationApp extends Application {
     /**
      *  Returns an int[][] containing the values of a GridPane.
      *
-     * @param node A node that points to a GridPane.
+     * @param node A node that is a GridPane containing the results.
      * @param rows The number of rows that the GridPane has.
      * @param cols The number of columns that the GridPane has.
      * @return An int[][] containing the values that have been entered into a GridPane.
@@ -267,7 +267,7 @@ public class MatrixMultiplicationApp extends Application {
      * @param matrix2 The second matrix to be added.
      * @return The result of adding matrix1 and matrix2.
      */
-    private int[][] addMatrices(int[][] matrix1, int[][] matrix2) {
+    public static int[][] addMatrices(int[][] matrix1, int[][] matrix2) {
         int rows = matrix1.length;
         int cols = matrix1[0].length;
         int[][] result = new int[rows][cols];
@@ -286,7 +286,7 @@ public class MatrixMultiplicationApp extends Application {
      * @param matrix2 The matrix to be subtracted.
      * @return The result of subtracting matrix2 from matrix1.
      */
-    private int[][] subtractMatrices(int[][] matrix1, int[][] matrix2) {
+    public static int[][] subtractMatrices(int[][] matrix1, int[][] matrix2) {
         int rows = matrix1.length;
         int cols = matrix1[0].length;
         int[][] result = new int[rows][cols];
@@ -305,7 +305,7 @@ public class MatrixMultiplicationApp extends Application {
      * @param matrix2 The matrix to be divided by.
      * @return The result of dividing matrix1 by matrix2.
      */
-    private int[][] divideMatrices(int[][] matrix1, int[][] matrix2) {
+    public static int[][] divideMatrices(int[][] matrix1, int[][] matrix2) {
         int rows = matrix1.length;
         int cols = matrix1[0].length;
         int[][] result = new int[rows][cols];
@@ -327,7 +327,7 @@ public class MatrixMultiplicationApp extends Application {
      * @param matrix2 The second matrix to be multiplied.
      * @return The result of multiplying matrix1 and matrix2.
      */
-    private int[][] multiplyMatrices(int[][] matrix1, int[][] matrix2) {
+    public static int[][] multiplyMatrices(int[][] matrix1, int[][] matrix2) {
         int rows1 = matrix1.length;
         int cols1 = matrix1[0].length;
         int cols2 = matrix2[0].length;
