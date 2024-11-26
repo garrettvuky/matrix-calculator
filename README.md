@@ -18,4 +18,3 @@ In the resulting text box enter the following:
 > --module-path "PATH_TO_JAVAFX_LIB" --add-modules=javafx.controls  
 
 Make sure to replace PATH_TO_JAVAFX_LIB with the file path of the javaFx lib file, which is contained in the file that was extracted earlier. The file path should end in "\javafx-sdk-23.0.1\lib"  
-This setting might not save automatically if you restart IntelliJ. In order to ensure it persists, check the box labeled "Store as a project file" located on the top right of the window.
